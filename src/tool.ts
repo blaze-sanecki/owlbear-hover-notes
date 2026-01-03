@@ -39,8 +39,8 @@ export async function setupTool() {
 					await OBR.popover.open({
 						id: `${ID}/popover`,
 						url: `/note.html?url=${encodeURIComponent(metadata.url)}&id=${item.id}`,
-						height: 400,
-						width: 400,
+						height: 100,
+						width: 200,
 						anchorReference: "POSITION",
 						anchorPosition: { left: position.x, top: position.y },
 						anchorOrigin: { horizontal: "CENTER", vertical: "CENTER" },
@@ -87,7 +87,7 @@ export async function setupTool() {
 		}
 	})
 
-	/*await OBR.tool.createMode({
+	await OBR.tool.createMode({
 		id: `${ID}/mode-disable`,
 		icons: [{
 			icon: "/images/icon-disable.svg",
@@ -97,17 +97,25 @@ export async function setupTool() {
 				roles: ["GM"],
 			},
 		}],
+		shortcut: "C",
 		onToolClick: async (_context: ToolContext, event: ToolEvent) => {
 			const itemId = event.target?.id;
 			if (!itemId) {
 				return;
 			}
+			let deleted = false;
 			await OBR.scene.items.updateItems([itemId], (items) => {
 				for (const item of items) {
-					delete item.metadata[`${ID}/note`];
+					if (item.metadata[`${ID}/note`]) {
+						delete item.metadata[`${ID}/note`];
+						deleted = true;
+					}
 				}
 			});
 			await OBR.player.deselect();
+			if (deleted) {
+				OBR.notification.show("Hover note removed.", "WARNING");
+			}
 		}
-	})*/
+	})
 }

@@ -8,6 +8,7 @@ OBR.onReady(async () => {
 
 	if (url) {
 		const img = document.getElementById('note-image') as HTMLImageElement;
+		const loading = document.getElementById('loading') as HTMLDivElement;
 
 		img.onload = async () => {
 			const viewportWidth = await OBR.viewport.getWidth();
@@ -29,6 +30,9 @@ OBR.onReady(async () => {
 
 			await OBR.popover.setWidth(`${ID}/popover`, width);
 			await OBR.popover.setHeight(`${ID}/popover`, height);
+
+			loading.style.display = 'none';
+			img.style.display = 'block';
 		};
 
 		img.src = url;
