@@ -96,6 +96,7 @@ export function setupContextMenu() {
 				for (const item of items) {
 					if (item.metadata[`${ID}/note`]) {
 						delete item.metadata[`${ID}/note`];
+						item.metadata[`${ID}/ignore-default`] = true;
 						deleted = true;
 					}
 				}
@@ -115,7 +116,6 @@ export function setupContextMenu() {
 				label: "Make Hover Default",
 				filter: {
 					every: [
-						{ key: ["metadata", `${ID}/note`], value: undefined, operator: "!=" },
 						{ key: "type", value: "IMAGE" },
 					],
 				},
@@ -123,14 +123,56 @@ export function setupContextMenu() {
 		],
 		async onClick(context) {
 			const item = context.items[0] as Image;
-			const metadata = item.metadata[`${ID}/note`] as { url: string };
-			if (metadata && metadata.url && item.image && item.image.url) {
-				const defaults = JSON.parse(localStorage.getItem(`${ID}/defaults`) || "{}");
+			if (!item.image || !item.image.url) return;
+
+			const metadata = item.metadata[`${ID}/note`] as { url: string } | undefined;
+			const defaults = JSON.parse(localStorage.getItem(`${ID}/defaults`) || "{}");
+
+			if (metadata && metadata.url) {
 				defaults[item.image.url] = metadata.url;
 				localStorage.setItem(`${ID}/defaults`, JSON.stringify(defaults));
-				await OBR.notification.show("Default hover note set.", "INFO");
-				await OBR.player.deselect();
+
+				const allItems = await OBR.scene.items.getItems();
+				const itemsToUpdate = allItems.filter((sceneItem) =>
+					sceneItem.type === "IMAGE" &&
+					(sceneItem as Image).image.url === item.image.url
+				);
+
+				if (itemsToUpdate.length > 0) {
+					await OBR.scene.items.updateItems(itemsToUpdate.map(i => i.id), (items) => {
+						for (const i of items) {
+							i.metadata[`${ID}/note`] = { url: metadata.url };
+						}
+					});
+					await OBR.notification.show(`Default hover note set (and applied to ${itemsToUpdate.length} existing items).`, "WARNING");
+				} else {
+					await OBR.notification.show("Default hover note set.", "INFO");
+				}
+			} else {
+				if (defaults[item.image.url]) {
+					delete defaults[item.image.url];
+					localStorage.setItem(`${ID}/defaults`, JSON.stringify(defaults));
+				}
+
+				const allItems = await OBR.scene.items.getItems();
+				const itemsToUpdate = allItems.filter((sceneItem) =>
+					sceneItem.type === "IMAGE" &&
+					(sceneItem as Image).image.url === item.image.url &&
+					sceneItem.metadata[`${ID}/note`]
+				);
+
+				if (itemsToUpdate.length > 0) {
+					await OBR.scene.items.updateItems(itemsToUpdate.map(i => i.id), (items) => {
+						for (const i of items) {
+							delete i.metadata[`${ID}/note`];
+						}
+					});
+					await OBR.notification.show(`Default hover note cleared (and removed from ${itemsToUpdate.length} items).`, "WARNING");
+				} else {
+					await OBR.notification.show("Default hover note removed.", "INFO");
+				}
 			}
+			await OBR.player.deselect();
 		},
 	});
 }

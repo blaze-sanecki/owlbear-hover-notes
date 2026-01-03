@@ -13,7 +13,8 @@ OBR.onReady(() => {
 		const defaults = JSON.parse(localStorage.getItem(`${ID}/defaults`) || "{}");
 		const itemsToUpdate = items.filter((item) => {
 			const metadata = item.metadata[`${ID}/note`] as { url: string } | undefined;
-			if (metadata) return false;
+			const ignore = item.metadata[`${ID}/ignore-default`];
+			if (metadata || ignore) return false;
 			else if (item.type === "IMAGE" && (item as Image).image && defaults[(item as Image).image.url]) {
 				return true;
 			}
