@@ -82,7 +82,7 @@ export async function setupTool() {
 				roles: ["GM"],
 			},
 		}],
-		onToolClick: async (context: ToolContext, event: ToolEvent) => {
+		onToolClick: async (_context: ToolContext, event: ToolEvent) => {
 			const itemId = event.target?.id;
 			if (!itemId) {
 				return;
