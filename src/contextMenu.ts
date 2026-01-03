@@ -3,54 +3,6 @@ import { ID } from "./constants";
 
 export function setupContextMenu() {
 	OBR.contextMenu.create({
-		id: `${ID}/context-menu-set`,
-		icons: [
-			{
-				icon: "/images/icon-select.svg",
-				label: "Set Hover Note...",
-				filter: {
-					roles: ["GM"],
-				},
-			},
-		],
-		async onClick(context) {
-			const images = await OBR.assets.downloadImages(false);
-			if (images.length > 0) {
-				const url = images[0].image.url;
-				const itemIds = context.items.map(item => item.id);
-				await OBR.scene.items.updateItems(itemIds, (items) => {
-					for (const item of items) {
-						item.metadata[`${ID}/note`] = { url };
-					}
-				});
-			}
-			await OBR.player.deselect();
-		},
-	});
-
-	OBR.contextMenu.create({
-		id: `${ID}/context-menu-clear`,
-		icons: [
-			{
-				icon: "/images/icon-disable.svg",
-				label: "Remove Hover Note",
-				filter: {
-					roles: ["GM"],
-				},
-			},
-		],
-		async onClick(context) {
-			const itemIds = context.items.map(item => item.id);
-			await OBR.scene.items.updateItems(itemIds, (items) => {
-				for (const item of items) {
-					delete item.metadata[`${ID}/note`];
-				}
-			});
-			await OBR.player.deselect();
-		},
-	});
-
-	OBR.contextMenu.create({
 		id: `${ID}/context-menu-open`,
 		icons: [
 			{
@@ -63,6 +15,7 @@ export function setupContextMenu() {
 				},
 			},
 		],
+		shortcut: "Z",
 		async onClick(context) {
 			const item = context.items[0];
 			const metadata = item.metadata[`${ID}/note`] as { url: string } | undefined;
@@ -91,6 +44,55 @@ export function setupContextMenu() {
 					hidePaper: true,
 				});
 			}
+		},
+	});
+	OBR.contextMenu.create({
+		id: `${ID}/context-menu-set`,
+		icons: [
+			{
+				icon: "/images/icon-select.svg",
+				label: "Set Hover Note...",
+				filter: {
+					roles: ["GM"],
+				},
+			},
+		],
+		shortcut: "X",
+		async onClick(context) {
+			const images = await OBR.assets.downloadImages(false);
+			if (images.length > 0) {
+				const url = images[0].image.url;
+				const itemIds = context.items.map(item => item.id);
+				await OBR.scene.items.updateItems(itemIds, (items) => {
+					for (const item of items) {
+						item.metadata[`${ID}/note`] = { url };
+					}
+				});
+			}
+			await OBR.player.deselect();
+		},
+	});
+
+	OBR.contextMenu.create({
+		id: `${ID}/context-menu-clear`,
+		icons: [
+			{
+				icon: "/images/icon-disable.svg",
+				label: "Remove Hover Note",
+				filter: {
+					roles: ["GM"],
+				},
+			},
+		],
+		shortcut: "C",
+		async onClick(context) {
+			const itemIds = context.items.map(item => item.id);
+			await OBR.scene.items.updateItems(itemIds, (items) => {
+				for (const item of items) {
+					delete item.metadata[`${ID}/note`];
+				}
+			});
+			await OBR.player.deselect();
 		},
 	});
 }

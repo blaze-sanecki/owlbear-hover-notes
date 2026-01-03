@@ -14,6 +14,7 @@ export async function setupTool() {
 				activeTools: [`${ID}/tool`],
 			},
 		}],
+		shortcut: "Z",
 		onToolMove: async (_context: ToolContext, event: ToolEvent) => {
 			const item = event.target;
 			if (item && item.id !== lastHoveredId) {
@@ -54,6 +55,7 @@ export async function setupTool() {
 				roles: ["GM"],
 			},
 		}],
+		shortcut: "X",
 		onToolClick: async (_context: ToolContext, event: ToolEvent) => {
 			const itemId = event.target?.id;
 			if (!itemId) {
@@ -82,6 +84,7 @@ export async function setupTool() {
 				roles: ["GM"],
 			},
 		}],
+		shortcut: "C",
 		onToolClick: async (_context: ToolContext, event: ToolEvent) => {
 			const itemId = event.target?.id;
 			if (!itemId) {
@@ -100,6 +103,6 @@ export async function setupTool() {
 		id: `${ID}/tool`,
 		icons: [{ icon: "/images/icon-view.svg", label: "View Hover Notes" }],
 		defaultMode: `${ID}/mode-view`,
-		shortcut: "V",
+		shortcut: "Z",
 	});
 }
