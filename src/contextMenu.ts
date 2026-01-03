@@ -6,7 +6,7 @@ export function setupContextMenu() {
 		id: `${ID}/context-menu-set`,
 		icons: [
 			{
-				icon: "/images/id-card.svg",
+				icon: "/images/icon-select.svg",
 				label: "Set Image on Select...",
 				filter: {
 					every: [{ key: "layer", value: "ATTACHMENT" }],
@@ -32,7 +32,7 @@ export function setupContextMenu() {
 		id: `${ID}/context-menu-clear`,
 		icons: [
 			{
-				icon: "/images/cancel.svg",
+				icon: "/images/icon-disable.svg",
 				label: "Disable Image on Select",
 				filter: {
 					every: [{ key: "layer", value: "ATTACHMENT" }],
@@ -47,6 +47,51 @@ export function setupContextMenu() {
 				}
 			});
 			await OBR.player.deselect();
+		},
+	});
+
+	OBR.contextMenu.create({
+		id: `${ID}/context-menu-open`,
+		icons: [
+			{
+				icon: "/images/icon-view.svg",
+				label: "Preview Image On Select",
+				filter: {
+					every: [
+						{ key: "layer", value: "ATTACHMENT" },
+						{ key: ["metadata", `${ID}/note`], value: undefined, operator: "!=" }
+					],
+				},
+			},
+		],
+		async onClick(context) {
+			const item = context.items[0];
+			const metadata = item.metadata[`${ID}/note`] as { url: string } | undefined;
+			if (metadata && metadata.url) {
+				const bounds = await OBR.scene.items.getItemBounds([item.id]);
+				const position = await OBR.viewport.transformPoint(bounds.center);
+
+				const width = 400;
+				const height = 400;
+				await OBR.popover.open({
+					id: `${ID}/popover`,
+					url: `/note.html?url=${encodeURIComponent(metadata.url)}`,
+					height,
+					width,
+					anchorReference: "POSITION",
+					anchorPosition: { left: position.x, top: position.y },
+					anchorOrigin: {
+						horizontal: "CENTER",
+						vertical: "CENTER",
+					},
+					transformOrigin: {
+						horizontal: "CENTER",
+						vertical: "CENTER",
+					},
+					disableClickAway: false,
+					hidePaper: true,
+				});
+			}
 		},
 	});
 }
