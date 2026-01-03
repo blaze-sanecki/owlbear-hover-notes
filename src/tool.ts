@@ -6,8 +6,14 @@ let lastHoveredId: string | null = null;
 
 export async function setupTool() {
 	await OBR.tool.createMode({
-		id: `${ID}/mode`,
-		icons: [{ icon: "/images/icon-view.svg", label: "View Notes" }],
+		id: `${ID}/mode-view`,
+		icons: [{
+			icon: "/images/icon-view.svg",
+			label: "View Hover Notes",
+			filter: {
+				activeTools: [`${ID}/tool`],
+			},
+		}],
 		onToolMove: async (_context: ToolContext, event: ToolEvent) => {
 			const item = event.target;
 			if (item && item.id !== lastHoveredId) {
@@ -38,9 +44,62 @@ export async function setupTool() {
 		},
 	});
 
+	await OBR.tool.createMode({
+		id: `${ID}/mode-set`,
+		icons: [{
+			icon: "/images/icon-select.svg",
+			label: "Set Hover Notes",
+			filter: {
+				activeTools: [`${ID}/tool`],
+				roles: ["GM"],
+			},
+		}],
+		onToolClick: async (context: ToolContext, event: ToolEvent) => {
+			const itemId = event.target?.id;
+			if (!itemId) {
+				return;
+			}
+			const images = await OBR.assets.downloadImages(false);
+			if (images.length > 0) {
+				const url = images[0].image.url;
+				await OBR.scene.items.updateItems([itemId], (items) => {
+					for (const item of items) {
+						item.metadata[`${ID}/note`] = { url };
+					}
+				});
+			}
+			await OBR.player.deselect();
+		}
+	})
+
+	await OBR.tool.createMode({
+		id: `${ID}/mode-disable`,
+		icons: [{
+			icon: "/images/icon-disable.svg",
+			label: "Remove Hover Notes",
+			filter: {
+				activeTools: [`${ID}/tool`],
+				roles: ["GM"],
+			},
+		}],
+		onToolClick: async (context: ToolContext, event: ToolEvent) => {
+			const itemId = event.target?.id;
+			if (!itemId) {
+				return;
+			}
+			await OBR.scene.items.updateItems([itemId], (items) => {
+				for (const item of items) {
+					delete item.metadata[`${ID}/note`];
+				}
+			});
+			await OBR.player.deselect();
+		}
+	})
+
 	await OBR.tool.create({
 		id: `${ID}/tool`,
-		icons: [{ icon: "/images/icon.svg", label: "View Notes" }],
-		defaultMode: `${ID}/mode`,
+		icons: [{ icon: "/images/icon-view.svg", label: "View Hover Notes" }],
+		defaultMode: `${ID}/mode-view`,
+		shortcut: "V",
 	});
 }

@@ -7,9 +7,9 @@ export function setupContextMenu() {
 		icons: [
 			{
 				icon: "/images/icon-select.svg",
-				label: "Set Image on Select...",
+				label: "Set Hover Note...",
 				filter: {
-					every: [{ key: "layer", value: "ATTACHMENT" }],
+					roles: ["GM"],
 				},
 			},
 		],
@@ -33,9 +33,9 @@ export function setupContextMenu() {
 		icons: [
 			{
 				icon: "/images/icon-disable.svg",
-				label: "Disable Image on Select",
+				label: "Remove Hover Note",
 				filter: {
-					every: [{ key: "layer", value: "ATTACHMENT" }],
+					roles: ["GM"],
 				},
 			},
 		],
@@ -55,10 +55,9 @@ export function setupContextMenu() {
 		icons: [
 			{
 				icon: "/images/icon-view.svg",
-				label: "Preview Image On Select",
+				label: "Preview Hover Note",
 				filter: {
 					every: [
-						{ key: "layer", value: "ATTACHMENT" },
 						{ key: ["metadata", `${ID}/note`], value: undefined, operator: "!=" }
 					],
 				},
