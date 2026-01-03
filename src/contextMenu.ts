@@ -57,7 +57,6 @@ export function setupContextMenu() {
 				},
 			},
 		],
-		shortcut: "X",
 		async onClick(context) {
 			const images = await OBR.assets.downloadImages(false);
 			if (images.length > 0) {
@@ -84,7 +83,6 @@ export function setupContextMenu() {
 				},
 			},
 		],
-		shortcut: "C",
 		async onClick(context) {
 			const itemIds = context.items.map(item => item.id);
 			await OBR.scene.items.updateItems(itemIds, (items) => {

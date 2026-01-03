@@ -5,6 +5,19 @@ import { ID } from "./constants";
 let lastHoveredId: string | null = null;
 
 export async function setupTool() {
+	await OBR.tool.create({
+		id: `${ID}/tool`,
+		icons: [{ icon: "/images/icon-view.svg", label: "View Hover Notes" }],
+		defaultMode: `${ID}/mode-view`,
+		shortcut: "Z",
+	});
+
+	OBR.tool.onToolChange(async (tool) => {
+		if (tool === `${ID}/tool`) {
+			OBR.tool.activateMode(`${ID}/tool`, `${ID}/mode-view`);
+		}
+	});
+
 	await OBR.tool.createMode({
 		id: `${ID}/mode-view`,
 		icons: [{
@@ -74,7 +87,7 @@ export async function setupTool() {
 		}
 	})
 
-	await OBR.tool.createMode({
+	/*await OBR.tool.createMode({
 		id: `${ID}/mode-disable`,
 		icons: [{
 			icon: "/images/icon-disable.svg",
@@ -84,7 +97,6 @@ export async function setupTool() {
 				roles: ["GM"],
 			},
 		}],
-		shortcut: "C",
 		onToolClick: async (_context: ToolContext, event: ToolEvent) => {
 			const itemId = event.target?.id;
 			if (!itemId) {
@@ -97,12 +109,5 @@ export async function setupTool() {
 			});
 			await OBR.player.deselect();
 		}
-	})
-
-	await OBR.tool.create({
-		id: `${ID}/tool`,
-		icons: [{ icon: "/images/icon-view.svg", label: "View Hover Notes" }],
-		defaultMode: `${ID}/mode-view`,
-		shortcut: "Z",
-	});
+	})*/
 }
